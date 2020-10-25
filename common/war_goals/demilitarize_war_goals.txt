@@ -53,18 +53,30 @@ wg_demilitarize = {
 				else = {
 					add_modifier = { modifier = dm_demilitarized days = 3600 }
 				}
-				set_policy = {
-					policy = war_philosophy
-					option = no_wars
-					cooldown = yes
+				if = {
+					limit = {
+						has_ethic = ethic_fanatic_militarist
+					}
+					set_policy = {
+						policy = war_philosophy
+						option = liberation_wars  # Can't set to Defensive Wars
+						cooldown = yes
+					}
+				}
+				else = {
+					set_policy = {
+						policy = war_philosophy
+						option = no_wars
+						cooldown = yes
+					}
 				}
 				root = {
 					save_event_target_as = demilitarization_victor  # Must before 102
 				}
-				country_event = {
-					id = demilitarization.102
-					days = 1
-				}
+				# country_event = {
+				# 	id = demilitarization.102
+				# 	days = 1
+				# }
 			}
 
 			# Victor
@@ -97,9 +109,13 @@ wg_demilitarize = {
 					}
 				}
 			}
+			# country_event = {
+			# 	id = demilitarization.101
+			# 	days = 1  # Delay to avoid removing buff
+			# }
 			country_event = {
-				id = demilitarization.101
-				days = 1  # Delay to avoid removing buff
+				id = demilitarization.103
+				days = 1
 			}
 		}
 	}

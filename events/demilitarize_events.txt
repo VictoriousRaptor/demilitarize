@@ -48,7 +48,7 @@ country_event = {
 	}
 }
 
-event = {
+country_event = {
 	id = demilitarization.102
 	hide_window = yes
 	is_triggered_only = yes
@@ -85,39 +85,54 @@ country_event = {
 	immediate = {
 		set_variable = {
 			which = i
-			value = 1
+			value = 0
 		}
 		while = {
 			limit = {
 				check_variable = {
 					which = i
-					value <= 120
+					value < 3600
 				}
 			}
+			# log = "i = [this.i]" #TODO
 			country_event = {
-				id = demilitarization.104
-				days = i
+				id = demilitarization.200
+				days = $i$
+			}
+			country_event = {
+				id = demilitarization.201
+				days = $i$
 			}
 			change_variable  = {
 				which = i
-				value = 1
+				value = 60
 			}
 		}
 	}
 }
 
 country_event = {
-	id = demilitarization.104
+	id = demilitarization.200
 	hide_window = yes
 	is_triggered_only = yes
 	immediate = {
 		if = {
 			limit = {
-				NOT = {
-					is_guaranteeing = event_target:demilitarization_loser
+				NOR = {
+					exists = event_target:demilitarization_loser
+					event_target:demilitarization_victor = {
+						is_guaranteeing = event_target:demilitarization_loser
+					}
 				}
 			}
-			remove_modifier = dm_demilitarizer
+			if = {
+				limit = {
+					exists = event_target:demilitarization_victor
+				}
+				event_target:demilitarization_victor = {
+					remove_modifier = dm_demilitarizer
+				}
+			}
 			if = {
 				limit = {
 					exists = event_target:demilitarization_loser
@@ -126,43 +141,99 @@ country_event = {
 					loser = event_target:demilitarization_loser
 				}
 			}
+			if = {
+				limit = {
+					exists = event_target:demilitarization_loser
+					exists = event_target:demilitarization_victor
+				}
+				# Message
+				create_message = {
+					type = DIPLO_ACTION_BREAK_GUARANTEE
+					localization = MESSAGE_DEMILITRAIZATION_REVOKE_GUARANTEE
+					days = 30
+					target = capital_scope
+					variable = {
+						type = name
+						localization = VICTOR
+						scope = event_target:demilitarization_victor
+					}
+					variable = {
+						type = name
+						localization = LOSER
+						scope = event_target:demilitarization_loser
+					}
+				}
+			}
 		}
+
+
+		# if = {
+		# 	limit = {
+		# 		NOR = {
+		# 			exists = event_target:demilitarization_loser
+		# 			is_guaranteeing = event_target:demilitarization_loser
+		# 		}
+		# 	}
+		# 	remove_modifier = dm_demilitarizer  # FIXME multi to multi
+		# }
 	}
 }
 
 country_event = {
-	id = demilitarization.104
+	id = demilitarization.201
 	hide_window = yes
 	is_triggered_only = yes
 	immediate = {
 		if = {
 			limit = {
-				has_modifier = dm_demilitarizer
-			}
-			every_country = {
-				limit = {
-					root = {
-						is_guaranteeing = this
+				NOR = {
+					exists = event_target:demilitarization_victor
+					exists = event_target:demilitarization_loser
+					event_target:demilitarization_victor = {
+						is_guaranteeing = event_target:demilitarization_loser
 					}
 				}
-				dm_remove_loser_mod = {
-					loser = this
-				}
 			}
-		}
-		else_if = {
-			limit = {
-				OR = {
-					has_modifier = dm_demilitarized
-					has_modifier = dm_demilitarized_mil
-				}
-			}
-			every_country = {
+			if = {
 				limit = {
-					is_guaranteeing = root
+					exists = event_target:demilitarization_victor
 				}
-				
+				event_target:demilitarization_victor = {
+					remove_modifier = dm_demilitarizer
+				}
+			}
+			if = {
+				limit = {
+					exists = event_target:demilitarization_loser
+				}
+				dm_remove_loser_mod = {
+					loser = event_target:demilitarization_loser
+				}
+			}
+			if = {
+				limit = {
+					exists = event_target:demilitarization_loser
+					exists = event_target:demilitarization_victor
+				}
+				# Message
+				create_message = {
+					type = DIPLO_ACTION_BREAK_GUARANTEE
+					localization = MESSAGE_DEMILITRAIZATION_REVOKE_GUARANTEE
+					days = 30
+					target = capital_scope
+					variable = {
+						type = name
+						localization = VICTOR
+						scope = event_target:demilitarization_victor
+					}
+					variable = {
+						type = name
+						localization = LOSER
+						scope = event_target:demilitarization_loser
+					}
+				}
 			}
 		}
 	}
 }
+
