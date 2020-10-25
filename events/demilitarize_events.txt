@@ -26,29 +26,29 @@ country_event = {
 				dm_remove_loser_mod = {
 					loser = event_target:demilitarization_loser
 				}
-			}
-			# Message
-			create_message = {
-				type = DIPLO_ACTION_BREAK_GUARANTEE
-				localization = MESSAGE_DEMILITRAIZATION_REVOKE_GUARANTEE
-				days = 30
-				target = capital_scope
-				variable = {
-					type = name
-					localization = LOSER
-					scope = event_target:demilitarization_loser
-				}
-				variable = {
-					type = name
-					localization = VICTOR
-					scope = root
+				# Message
+				create_message = {
+					type = DIPLO_ACTION_BREAK_GUARANTEE
+					localization = MESSAGE_DEMILITRAIZATION_REVOKE_GUARANTEE
+					days = 30
+					target = capital_scope
+					variable = {
+						type = name
+						localization = LOSER
+						scope = event_target:demilitarization_loser
+					}
+					variable = {
+						type = name
+						localization = VICTOR
+						scope = root
+					}
 				}
 			}
 		}
 	}
 }
 
-country_event = {
+event = {
 	id = demilitarization.102
 	hide_window = yes
 	is_triggered_only = yes
@@ -72,6 +72,96 @@ country_event = {
 					id = demilitarization.102
 					days = 30
 				}
+			}
+		}
+	}
+}
+
+# Dispatch
+country_event = {
+	id = demilitarization.103
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		set_variable = {
+			which = i
+			value = 1
+		}
+		while = {
+			limit = {
+				check_variable = {
+					which = i
+					value <= 120
+				}
+			}
+			country_event = {
+				id = demilitarization.104
+				days = i
+			}
+			change_variable  = {
+				which = i
+				value = 1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = demilitarization.104
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			limit = {
+				NOT = {
+					is_guaranteeing = event_target:demilitarization_loser
+				}
+			}
+			remove_modifier = dm_demilitarizer
+			if = {
+				limit = {
+					exists = event_target:demilitarization_loser
+				}
+				dm_remove_loser_mod = {
+					loser = event_target:demilitarization_loser
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = demilitarization.104
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			limit = {
+				has_modifier = dm_demilitarizer
+			}
+			every_country = {
+				limit = {
+					root = {
+						is_guaranteeing = this
+					}
+				}
+				dm_remove_loser_mod = {
+					loser = this
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_modifier = dm_demilitarized
+					has_modifier = dm_demilitarized_mil
+				}
+			}
+			every_country = {
+				limit = {
+					is_guaranteeing = root
+				}
+				
 			}
 		}
 	}
